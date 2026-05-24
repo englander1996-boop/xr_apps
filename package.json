@@ -1,0 +1,15 @@
+{
+  "name": "xr-apps-deps",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Even G2 自作アプリ群の依存を root に集約するマニフェスト。各アプリ配下の package.json には個別に deps が書いてあるが、xr <name> 経由で起動するときは npm install を root で 1 回だけ走らせ、Node の親ディレクトリ resolution が xr_apps/node_modules を共有する形で全アプリの依存を解決する。npm workspaces は使っていない (Windows での symlink syscall が EISDIR で死ぬため)。",
+  "dependencies": {
+    "@evenrealities/even_hub_sdk": "latest",
+    "@jappyjan/even-better-sdk": "^0.0.10",
+    "@jappyjan/even-realities-ui": "^0.0.10"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}

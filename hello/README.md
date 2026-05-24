@@ -71,30 +71,26 @@ const TEXT_HEIGHT = 80
 
 `startupRendered` フラグで初回かどうかを判定している。
 
-### タップを拾うための不可視 List
+### タップを拾う仕組み（text-capture）
 
-**`TextContainerProperty` 単体に `isEventCapture: 1` を付けてもグラスからの `CLICK_EVENT` は届かない**（少なくとも Simulator では）。
-そのため hello では、表示は `text`、イベント受けは別建てで **1×1 の不可視 `ListContainerProperty`** を置き、そっちに `isEventCapture: 1` を付けている。
+グラスからの `CLICK_EVENT` / `DOUBLE_CLICK_EVENT` / `SCROLL_*_EVENT` は、**表示用の `TextContainerProperty` 自身に `isEventCapture: 1` を付ける** だけで全部届く（公式 `even-dev/apps/hello` と同じ方式）。
 
 ```ts
-listObject: [
-  new ListContainerProperty({
-    containerID: CAPTURE_CONTAINER_ID,
-    containerName: 'hello-capture',
-    itemContainer: new ListItemContainerProperty({
-      itemCount: 1,
-      itemWidth: 1,
-      isItemSelectBorderEn: 0,
-      itemName: [' '],
-    }),
-    isEventCapture: 1,
-    xPosition: 0, yPosition: 0, width: 1, height: 1,
+textObject: [
+  new TextContainerProperty({
+    containerID: TEXT_CONTAINER_ID,
+    containerName: TEXT_CONTAINER_NAME,
+    content: text,
+    xPosition: TEXT_X, yPosition: TEXT_Y,
+    width: TEXT_WIDTH, height: TEXT_HEIGHT,
+    isEventCapture: 1,   // ← これだけで click/double/scroll が来る
   }),
 ],
 ```
 
-これは `even-dev/apps/timer/src/timer-controller.ts` の `'timer-hidden-capture'` と同じ手法。
-`containerTotalNum` はテキスト + 不可視リストで **2** になる。
+`containerTotalNum` は **1**（text だけ）。
+
+> **以前は List 方式だった**（1×1 不可視 `ListContainerProperty` でイベントを拾う）。しかし List の scroll は内部選択 index 依存で **up が原理的に取れない** 欠陥があり、text-capture に切り替えた。`_lib/even.ts` も同じ理由で text-capture を採用している。
 
 ## イベント
 
@@ -116,9 +112,9 @@ bridge.onEvenHubEvent((event) => { ... })
 ## 拡張ポイント
 
 - **メッセージを増やす**：`MESSAGES` 配列に追加するだけ
-- **複数行 / 複数要素**：`buildPayload` の `textObject` に `TextContainerProperty` を足し、`containerTotalNum` を増やす（不可視 List も 1 個ぶん含めて数える）
-- **スワイプにも反応**：`OsEventTypeList.SCROLL_TOP_EVENT` / `SCROLL_BOTTOM_EVENT` を `handleEvent` に追加
-- **見せる List UI が欲しくなったら**：不可視 List の代わりに本物の List を出して `isEventCapture: 1` を付ければよい。実装例は `even-dev/apps/timer` / `quicktest` / `base_app` が参考になる
+- **複数行 / 複数要素**：`buildPayload` の `textObject` に `TextContainerProperty` を足し、`containerTotalNum` を増やす
+- **スワイプにも反応**：`OsEventTypeList.SCROLL_TOP_EVENT`（up）/ `SCROLL_BOTTOM_EVENT`（down）を `handleEvent` に追加（text-capture なら typed eventType で届く）
+- **見せる List UI が欲しくなったら**：本物の List を出して `isEventCapture: 1` を付ける。実装例は `even-dev/apps/timer` / `quicktest` / `base_app` が参考になる
 
 ## デプロイ（実機 G2 へ）
 

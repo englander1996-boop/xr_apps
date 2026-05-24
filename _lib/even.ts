@@ -1,13 +1,11 @@
 // Even G2 アプリ共通ヘルパ。
 // - bridge connect (timeout 付き)
-// - 1×1 不可視 capture List + Text の標準ページ構成
+// - 全画面不可視 capture Text (isEventCapture: 1) の標準ページ構成
 // - イベント正規化 (OsEventTypeList.fromJson) + デバウンス
 // - mock mode (ブラウザ単独確認用)
 
 import {
   CreateStartUpPageContainer,
-  ListContainerProperty,
-  ListItemContainerProperty,
   OsEventTypeList,
   RebuildPageContainer,
   TextContainerProperty,
@@ -82,15 +80,45 @@ function pickRawEventType(event: EvenHubEvent): unknown {
   )
 }
 
-function classifyKind(event: EvenHubEvent): EventKind | null {
+function pickSelectIndex(raw: unknown): number | null {
+  if (typeof raw === 'number' && Number.isFinite(raw)) return raw
+  if (typeof raw === 'string') {
+    const n = Number.parseInt(raw, 10)
+    return Number.isFinite(n) ? n : null
+  }
+  return null
+}
+
+// イベント分類。
+// even-dev/apps/hello は TextContainerProperty 単体 (isEventCapture: 1) で click/double/scroll を
+// 拾えている (= List は必須ではない)。text-capture では eventType が typed (CLICK/SCROLL_TOP/...) で
+// 来るのが基本。List-capture では eventType=undefined + currentSelectItemIndex の差分でしか
+// scroll を判別できないケースがあるので、その fallback も残す。
+function classifyKind(event: EvenHubEvent, prevIndex: number): EventKind | null {
   const raw = pickRawEventType(event)
   const type = OsEventTypeList.fromJson(raw)
+  // typed event (eventType あり)
   if (type === OsEventTypeList.CLICK_EVENT) return 'click'
   if (type === OsEventTypeList.DOUBLE_CLICK_EVENT) return 'double'
   if (type === OsEventTypeList.SCROLL_TOP_EVENT) return 'up'
   if (type === OsEventTypeList.SCROLL_BOTTOM_EVENT) return 'down'
-  // hello-capture と同じパターン: listEvent が eventType=undefined で来たら CLICK 扱い
-  if (type === undefined && event.listEvent) return 'click'
+
+  // 認識できない typed event (FOREGROUND_ENTER 等) はここで無視。
+  // 以降は「eventType が一切無い (raw == null)」イベントだけのフォールバック。
+  if (raw != null) return null
+
+  // List-capture の fallback: idx 差分で scroll 判定、それ以外は click
+  if (event.listEvent) {
+    const idx = pickSelectIndex(event.listEvent.currentSelectItemIndex)
+    if (idx !== null) {
+      if (idx > prevIndex) return 'down'
+      if (idx < prevIndex) return 'up'
+    }
+    return 'click'
+  }
+  // text-capture の単タップ: eventType 無しの sysEvent (eventSource のみ) または textEvent で届く。
+  // ダブルタップは sysEvent.eventType=3 で来るので上の typed 分岐で先に拾われる。
+  if (event.sysEvent || event.textEvent) return 'click'
   return null
 }
 
@@ -106,6 +134,9 @@ export async function createEvenApp(options: ConnectOptions = {}): Promise<EvenA
   let lastKind: EventKind | null = null
   let lastAt = 0
   let logger: Logger = () => {}
+  // capture List の現在選択 index を追跡。scroll-up/down 判定に使う。
+  // 初期値は List の初期 selection (0) と一致させる。
+  let prevSelectIndex = 0
 
   const handlers: Record<EventKind, EventHandler[]> = {
     click: [],
@@ -121,8 +152,15 @@ export async function createEvenApp(options: ConnectOptions = {}): Promise<EvenA
   }
 
   if (bridge) {
+    let lastAudioLogAt = 0
+    const AUDIO_LOG_INTERVAL_MS = 1000
     bridge.onEvenHubEvent((event) => {
-      const kind = classifyKind(event)
+      const kind = classifyKind(event, prevSelectIndex)
+      // listEvent に index が乗っていれば「前回 index」を更新。次回 swipe の差分判定に使う。
+      if (event.listEvent) {
+        const idx = pickSelectIndex(event.listEvent.currentSelectItemIndex)
+        if (idx !== null) prevSelectIndex = idx
+      }
       const container =
         event.listEvent?.containerName ?? event.textEvent?.containerName ?? '-'
       const source = event.listEvent
@@ -131,8 +169,19 @@ export async function createEvenApp(options: ConnectOptions = {}): Promise<EvenA
           ? 'text'
           : event.sysEvent
             ? 'sys'
-            : 'other'
-      logger(`event kind=${kind ?? 'unknown'} source=${source} container=${container}`)
+            : event.audioEvent
+              ? 'audio'
+              : 'other'
+      // audio (PCM) は秒数十回流れるので 1 秒スロットル。他のジェスチャ系は毎回ログ。
+      if (source === 'audio') {
+        const now = Date.now()
+        if (now - lastAudioLogAt >= AUDIO_LOG_INTERVAL_MS) {
+          logger(`event kind=${kind ?? 'unknown'} source=audio container=${container}`)
+          lastAudioLogAt = now
+        }
+      } else {
+        logger(`event kind=${kind ?? 'unknown'} source=${source} container=${container}`)
+      }
 
       if (!kind) return
       const now = Date.now()
@@ -167,30 +216,30 @@ export async function createEvenApp(options: ConnectOptions = {}): Promise<EvenA
         }),
     )
 
-    const listObject = captureContainer
-      ? [
-          new ListContainerProperty({
-            containerID: CAPTURE_ID,
-            containerName: CAPTURE_NAME,
-            itemContainer: new ListItemContainerProperty({
-              itemCount: 1,
-              itemWidth: 1,
-              isItemSelectBorderEn: 0,
-              itemName: [' '],
-            }),
-            isEventCapture: 1,
-            xPosition: 0,
-            yPosition: 0,
-            width: 1,
-            height: 1,
-          }),
-        ]
-      : []
+    // イベント捕捉方式 (2026-05-25 方針転換):
+    // even-dev/apps/hello は List を一切使わず TextContainerProperty 単体の isEventCapture: 1 で
+    // click/double/scroll を全部拾えている (公式リファレンス)。List-capture 方式だと up が
+    // 初期 idx=0 から発火せず詰むので、even-dev と同じ text-capture に切り替える。
+    // 全画面 (576×136) の content=' ' な不可視 text に isEventCapture: 1 を付けて sink にする。
+    if (captureContainer) {
+      textObject.push(
+        new TextContainerProperty({
+          containerID: CAPTURE_ID,
+          containerName: CAPTURE_NAME,
+          content: ' ',
+          xPosition: 0,
+          yPosition: 0,
+          width: 576,
+          height: 136,
+          isEventCapture: 1,
+        }),
+      )
+    }
 
     const payload = {
-      containerTotalNum: textObject.length + listObject.length,
+      containerTotalNum: textObject.length,
       textObject,
-      listObject,
+      listObject: [],
     }
 
     if (!startupRendered) {

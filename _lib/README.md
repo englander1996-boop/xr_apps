@@ -3,7 +3,7 @@
 `xr_apps/` 直下の自作アプリが共通で使うライブラリ。各アプリは `import` するだけで:
 
 - Even Hub Bridge への接続 (失敗時 mock モード)
-- イベント正規化 + デバウンス + 1×1 不可視キャプチャ List 自動配置
+- イベント正規化 + デバウンス + 全画面不可視キャプチャ Text 自動配置 (click/double/up/down)
 - ブラウザ側ミニ UI 骨格 (タイトル / ボタン / コンテンツ / Event Log)
 - localStorage の JSON 入出力
 - HTTP 取得 + 詳細ログ
@@ -50,7 +50,7 @@ Bridge への接続を試み、結果として `EvenApp` オブジェクトを�
 const app = await createEvenApp({
   timeoutMs: 4000,       // bridge 接続待ち上限 (デフォ 4000)
   debounceMs: 250,       // 同 kind イベント連射の抑止間隔 (デフォ 250)
-  captureContainer: true // 1×1 不可視キャプチャ List を自動配置 (デフォ true)
+  captureContainer: true // 全画面不可視キャプチャ Text を自動配置 (デフォ true)
 })
 ```
 
@@ -61,13 +61,17 @@ const app = await createEvenApp({
 ```ts
 app.on('click',  () => { /* シングルタップ */ })
 app.on('double', () => { /* ダブルタップ */ })
-app.on('up',     () => { /* スクロール上 (1×1 不可視 List で発火するかは要検証) */ })
+app.on('up',     () => { /* スクロール上 */ })
 app.on('down',   () => { /* スクロール下 */ })
 ```
 
+> **イベント捕捉方式**: 全画面 (576×136) の content=' ' な不可視 `TextContainerProperty` に `isEventCapture: 1` を付けて sink にしている (`containerID: 99, containerName: 'evn-capture'`)。これは公式 `even-dev/apps/hello` と同じ text-capture 方式で、4 種の入力 (click / double / scroll-up / scroll-down) が `event.textEvent.eventType` に typed な値で届く。
+>
+> **過去の List-capture 方式は廃止**: 以前は不可視 `ListContainerProperty` で拾っていたが、List の scroll は内部選択 index が変化したときだけ発火し、`rebuildPageContainer` が毎回 index を 0 に戻すため **up が原理的に取れない** という欠陥があった (詳細は memory `even-g2-tap-needs-list-capture`)。text-capture に切り替えて解決。`captureContainer: false` にすると capture text を置かず、入力は一切取れなくなる。
+
 #### `app.render(textLines: LensTextLine[]): Promise<void>`
 
-グラスにテキスト行を描画。**`captureContainer: true`** の場合、自動で 1×1 不可視 List が `containerID: 99, containerName: 'evn-capture'` で同居する。
+グラスにテキスト行を描画。**`captureContainer: true`** の場合、自動で全画面不可視 capture Text が `containerID: 99, containerName: 'evn-capture'` で同居する。
 
 ```ts
 import { lines } from '../../_lib/even'
@@ -225,7 +229,7 @@ render()
 
 ## カスタマイズが必要になったケース
 
-- **scroll-up/down が要らない・キャプチャ List 邪魔**: `createEvenApp({ captureContainer: false })`
+- **入力を一切取らない (表示専用)**: `createEvenApp({ captureContainer: false })` で capture Text を置かない
 - **画面いっぱいに 5 行表示したい**: `lines()` ではなく自前で `LensTextLine[]` を組み立てる (y 位置 48px 刻み等)
 - **画像表示したい**: `bridge.updateImageRawData(...)` を直接呼ぶ (現状 `_lib` 未対応)
 - **マイクで連続録音したい**: `app.audio.onPcm(handler)` で PCM チャンクを受け、WAV ヘッダを自前で組む (`dbmeter` が参考)

@@ -253,7 +253,7 @@ Write-Host "  -> $AppDir"
 Write-Host ""
 
 Install-IfNeeded -Dir $EvenDev -Label 'even-dev root'
-Install-IfNeeded -Dir $AppDir  -Label $App
+Install-IfNeeded -Dir $Root    -Label 'xr_apps (shared deps)'
 
 # Port check only matters when we're starting Vite ourselves (not SimOnly).
 if (-not $SimOnly) {

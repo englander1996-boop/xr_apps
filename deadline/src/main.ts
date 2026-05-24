@@ -22,7 +22,21 @@ const app = await createEvenApp()
 app.setLogger((l) => preview.log(l))
 preview.setStatus(app.connected ? 'Connected' : 'Bridge unavailable (preview only)')
 
+app.on('click', () => adjustDate(1))
+app.on('double', () => adjustDate(-1))
+
 function escape(s: string): string { return s.replace(/[<>&"]/g, (c) => ({ '<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;' }[c]!)) }
+
+function adjustDate(deltaDays: number) {
+  const cur = new Date(stored.targetISO + 'T00:00:00')
+  cur.setDate(cur.getDate() + deltaDays)
+  stored.targetISO = cur.toISOString().slice(0, 10)
+  saveJson(KEY, stored)
+  const dateEl = document.getElementById('dl-date') as HTMLInputElement | null
+  if (dateEl) dateEl.value = stored.targetISO
+  preview.log(`adjusted target=${stored.targetISO} (${deltaDays > 0 ? '+' : ''}${deltaDays}d)`)
+  render()
+}
 
 function targetMs(): number {
   const d = new Date(stored.targetISO + 'T00:00:00')

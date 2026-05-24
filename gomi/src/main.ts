@@ -20,16 +20,22 @@ preview.appendBody(DAYS.map((d, i) =>
     <input id="gm-${i}" type="text" value="${state.schedule[i]}" style="flex:1;padding:6px;background:#0a0a0a;color:#f0f0f0;border:1px solid #2a2a2a;border-radius:4px;font-size:13px;">
   </div>`).join(''))
 
+let offset = 0  // 0 = today, 1 = tomorrow, ... 6 = a week away
+
 const app = await createEvenApp()
 app.setLogger((l) => preview.log(l))
 preview.setStatus(app.connected ? 'Connected' : 'Bridge unavailable (preview only)')
+app.on('click', () => { offset = (offset + 1) % 7; render() })
+app.on('double', () => { offset = 0; render() })
 
 function render() {
   const now = new Date()
-  const today = state.schedule[now.getDay()] || '(no trash)'
-  const tomorrow = state.schedule[(now.getDay() + 1) % 7] || '(no trash)'
-  preview.setContent(`Today (${DAYS[now.getDay()]}): ${today}\nTomorrow: ${tomorrow}`)
-  void app.render(lines(`Today: ${today}`, `Tomorrow: ${tomorrow}`))
+  const idx = (now.getDay() + offset) % 7
+  const trash = state.schedule[idx] || '(no trash)'
+  const nextTrash = state.schedule[(idx + 1) % 7] || '(no trash)'
+  const label = offset === 0 ? 'Today' : offset === 1 ? 'Tomorrow' : `+${offset}d`
+  preview.setContent(`${label} (${DAYS[idx]}): ${trash}\nNext (${DAYS[(idx + 1) % 7]}): ${nextTrash}`)
+  void app.render(lines(`${label} ${DAYS[idx]}: ${trash}`, `Next: ${nextTrash}`))
 }
 function save() {
   for (let i = 0; i < 7; i++) {

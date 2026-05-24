@@ -1,8 +1,6 @@
 import './styles.css'
 import {
   CreateStartUpPageContainer,
-  ListContainerProperty,
-  ListItemContainerProperty,
   OsEventTypeList,
   RebuildPageContainer,
   TextContainerProperty,
@@ -21,8 +19,6 @@ const MESSAGES = [
 
 const TEXT_CONTAINER_ID = 1
 const TEXT_CONTAINER_NAME = 'hello-text'
-const CAPTURE_CONTAINER_ID = 2
-const CAPTURE_CONTAINER_NAME = 'hello-capture'
 const LENS_WIDTH = 576
 const TEXT_X = 8
 const TEXT_Y = 80
@@ -91,11 +87,11 @@ let bridge: EvenAppBridge | null = null
 let messageIndex = 0
 let startupRendered = false
 
-// G2 のタップ/スクロールは List コンテナ経由でしか届かない（テキスト単体だと CLICK_EVENT が
-// 飛んでこない）。表示は text にやらせ、イベントを拾うためだけの 1x1 不可視 List を一緒に置く。
+// G2 のタップ/ダブルタップ/スクロールは TextContainerProperty に isEventCapture: 1 を付ければ
+// 全部届く (公式 even-dev/apps/hello と同じ text-capture 方式)。表示用テキスト自身を sink に使う。
 function buildPayload(text: string) {
   return {
-    containerTotalNum: 2,
+    containerTotalNum: 1,
     textObject: [
       new TextContainerProperty({
         containerID: TEXT_CONTAINER_ID,
@@ -105,24 +101,7 @@ function buildPayload(text: string) {
         yPosition: TEXT_Y,
         width: TEXT_WIDTH,
         height: TEXT_HEIGHT,
-        isEventCapture: 0,
-      }),
-    ],
-    listObject: [
-      new ListContainerProperty({
-        containerID: CAPTURE_CONTAINER_ID,
-        containerName: CAPTURE_CONTAINER_NAME,
-        itemContainer: new ListItemContainerProperty({
-          itemCount: 1,
-          itemWidth: 1,
-          isItemSelectBorderEn: 0,
-          itemName: [' '],
-        }),
         isEventCapture: 1,
-        xPosition: 0,
-        yPosition: 0,
-        width: 1,
-        height: 1,
       }),
     ],
   }
@@ -176,14 +155,14 @@ function handleEvent(event: EvenHubEvent): void {
   const source = event.listEvent ? 'list' : event.textEvent ? 'text' : event.sysEvent ? 'sys' : 'other'
   appendLog(`event type=${type ?? 'unknown'} source=${source} container=${container}`)
 
-  // シングルタップ: hello-capture (1x1 不可視 List) で eventType 未指定の listEvent として来る。
-  // timer-controller.ts の「listEvent && eventType===undefined → CLICK 扱い」と同じパターン。
+  // text-capture では eventType が typed (CLICK/DOUBLE_CLICK/SCROLL_*) で届く。
+  // 念のため eventType 未指定の textEvent はタップ扱いの fallback を残す。
   let kind: 'click' | 'double' | null = null
   if (type === OsEventTypeList.DOUBLE_CLICK_EVENT) {
     kind = 'double'
   } else if (type === OsEventTypeList.CLICK_EVENT) {
     kind = 'click'
-  } else if (type === undefined && event.listEvent && container === CAPTURE_CONTAINER_NAME) {
+  } else if (type === undefined && event.textEvent) {
     kind = 'click'
   }
 

@@ -21,6 +21,7 @@ const app = await createEvenApp()
 app.setLogger((l) => preview.log(l))
 preview.setStatus(app.connected ? 'Connected' : 'Bridge unavailable (preview only)')
 app.on('click', () => cycle())
+app.on('double', () => { mode = 'sec'; render() })
 
 function value(): number {
   const ms = Date.now() - new Date(dob + 'T00:00:00').getTime()

@@ -24,7 +24,7 @@ preview.setStatus(app.connected ? 'Connected' : 'Bridge unavailable (preview onl
 app.on('click', () => toggle())
 app.on('double', () => reset())
 
-function bar(n: number, total: number): string { const filled = Math.round((1 - n / total) * 8); return '█'.repeat(filled) + '░'.repeat(8 - filled) }
+function bar(n: number, total: number): string { const filled = Math.round((1 - n / total) * 8); return '█'.repeat(filled) + '-'.repeat(8 - filled) }
 function render() {
   const p = PHASES[idx]
   preview.setContent(`${p.name}  ${remaining}s\n${bar(remaining, p.sec)}\nCycles ${cycles}`)

@@ -29,7 +29,7 @@ function fmtSince(ms: number): string {
   return m < 60 ? `${m}m ago` : `${Math.floor(m / 60)}h ${m % 60}m ago`
 }
 function render() {
-  const bars = '█'.repeat(Math.min(state.count, state.goal)) + '░'.repeat(Math.max(0, state.goal - state.count))
+  const bars = '█'.repeat(Math.min(state.count, state.goal)) + '-'.repeat(Math.max(0, state.goal - state.count))
   preview.setContent(`Today: ${state.count}/${state.goal} cups\n${bars}\nLast sip: ${fmtSince(state.lastAt)}`)
   void app.render(lines(`Water ${state.count}/${state.goal}`, `${bars}  last ${fmtSince(state.lastAt)}`))
 }

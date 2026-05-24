@@ -20,6 +20,18 @@ const state: State = {
   revealedCount: 0,
 }
 
+const AUTO_RESTART_MS = 3000
+let autoRestartTimer: ReturnType<typeof setTimeout> | null = null
+
+function scheduleAutoRestart(): void {
+  if (autoRestartTimer !== null) clearTimeout(autoRestartTimer)
+  autoRestartTimer = setTimeout(() => {
+    autoRestartTimer = null
+    preview.log('auto restart')
+    reset()
+  }, AUTO_RESTART_MS)
+}
+
 const preview = setupPreview({
   title: 'Minesweeper',
   subtitle: `${SIZE}x${SIZE}, ${MINE_COUNT} mines. Scroll=row, tap=col, double=reveal`,
@@ -111,6 +123,7 @@ function reveal(): void {
     cell.revealed = true
     preview.log(`*** BOOM at (${r},${c}) ***`)
     render()
+    scheduleAutoRestart()
     return
   }
 
@@ -121,9 +134,11 @@ function reveal(): void {
     preview.log('*** YOU WON ***')
   }
   render()
+  if (state.result !== 'playing') scheduleAutoRestart()
 }
 
 function reset(): void {
+  if (autoRestartTimer !== null) { clearTimeout(autoRestartTimer); autoRestartTimer = null }
   state.grid = newGrid()
   state.cursor = { r: 0, c: 0 }
   state.result = 'playing'

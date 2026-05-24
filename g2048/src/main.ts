@@ -20,7 +20,7 @@ let lastMove = '-'
 // =================== UI ===================
 const preview = setupPreview({
   title: '2048',
-  subtitle: 'Tap=→ / Double=← / Scroll up=↑ / Scroll down=↓',
+  subtitle: 'Glass: tap=right / double=left / up=up / down=down (game over 時は double で New)',
   buttons: [
     { id: 'up', label: '↑ Up', onClick: () => move('up') },
     { id: 'down', label: '↓ Down', onClick: () => move('down') },
@@ -33,10 +33,11 @@ const preview = setupPreview({
 const app = await createEvenApp()
 app.setLogger((l) => preview.log(l))
 preview.setStatus(app.connected ? 'Connected' : 'Bridge unavailable (preview only)')
-app.on('click', () => move('right'))
-app.on('double', () => move('left'))
+// グラス 4 ジェスチャをそのまま 4 方向に割り当てる。double だけ game-over 時の reset を兼ねる。
 app.on('up', () => move('up'))
 app.on('down', () => move('down'))
+app.on('click', () => move('right'))
+app.on('double', () => { if (lost) reset(); else move('left') })
 
 // =================== ロジック ===================
 function emptyGrid(): Grid {
@@ -187,8 +188,10 @@ function render(): void {
     })),
     {
       id: 5,
-      name: 'score',
-      content: `S:${score} B:${best} ${lost ? 'OVER' : won ? 'WIN' : ''}`,
+      name: 'status',
+      content: lost
+        ? `S:${score} B:${best} OVER dbl=new`
+        : `S:${score} B:${best}${won ? ' WIN' : ''}`,
       x: 8,
       y: 8 + 4 * 50,
       width: 560,
