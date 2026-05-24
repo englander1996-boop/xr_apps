@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.sitalert",
+  "edition": "202601",
+  "name": "Sit Alert",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Stand-up reminder every X minutes.",
+  "description": "Reminds you to stand. Tap to reset the timer when you stood.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

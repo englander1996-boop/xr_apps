@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.minesweeper",
+  "edition": "202601",
+  "name": "Minesweeper",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Reveal cells, avoid mines. No flags.",
+  "description": "4x4 minesweeper with cascading reveal. Tap=cursor right, scroll=up/down, double=reveal.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

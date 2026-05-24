@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.morse",
+  "edition": "202601",
+  "name": "Morse",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Morse code reference.",
+  "description": "A-Z and 0-9 morse code with toggleable reveal.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

@@ -1,0 +1,19 @@
+{
+  "package_id": "com.yuisho.sandbox",
+  "edition": "202601",
+  "name": "Sandbox",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Personal sandbox app for Even G2 experiments.",
+  "description": "Personal sandbox app",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": {
+    "network": [
+      "evenhub.evenrealities.com"
+    ],
+    "fs": [
+      "./assets"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "package_id": "com.yuisho.wikitoday",
+  "edition": "202601",
+  "name": "Wiki Today",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "On this day from Wikipedia.",
+  "description": "Cycle through historical events on today's date, fetched from English Wikipedia REST API.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": {
+    "network": ["en.wikipedia.org"],
+    "fs": []
+  }
+}

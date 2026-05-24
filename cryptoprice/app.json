@@ -1,0 +1,15 @@
+{
+  "package_id": "com.yuisho.cryptoprice",
+  "edition": "202601",
+  "name": "Crypto Price",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "BTC / ETH / SOL price ticker.",
+  "description": "Polls CoinGecko free API every 60s. Tap cycles through coins on the lens.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": {
+    "network": ["api.coingecko.com"],
+    "fs": []
+  }
+}

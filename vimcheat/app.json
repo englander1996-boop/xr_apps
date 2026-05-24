@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.vimcheat",
+  "edition": "202601",
+  "name": "Vim Cheat",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Vim shortcuts.",
+  "description": "Cycle through frequently-forgotten Vim commands.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

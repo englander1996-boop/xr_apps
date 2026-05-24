@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.gomi",
+  "edition": "202601",
+  "name": "Gomi",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "今日のゴミの日",
+  "description": "Configure weekly trash schedule, glass shows today's category.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

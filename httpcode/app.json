@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.httpcode",
+  "edition": "202601",
+  "name": "HTTP Codes",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "HTTP status codes reference.",
+  "description": "Cycle through common HTTP status codes and their meaning.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.gitcheat",
+  "edition": "202601",
+  "name": "Git Cheat",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Git commands cheat sheet.",
+  "description": "Cycle through commonly-forgotten git commands.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

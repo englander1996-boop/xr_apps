@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.pi",
+  "edition": "202601",
+  "name": "Pi",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Pi digit memorizer.",
+  "description": "Reveals one digit at a time so you can memorize.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

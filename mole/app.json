@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.mole",
+  "edition": "202601",
+  "name": "Whack-a-Mole",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Tap when MOLE appears, not before.",
+  "description": "Random delays. Tap when MOLE is shown; tapping during WAIT loses points.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

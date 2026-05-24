@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.dice",
+  "edition": "202601",
+  "name": "Dice",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Roll a die on your face.",
+  "description": "Tap=roll d6, double=roll d20. Browser has more options.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

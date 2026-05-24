@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.g2048",
+  "edition": "202601",
+  "name": "2048",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "2048 sliding tile puzzle.",
+  "description": "Classic 2048 on a 4x4 grid. Tap=right, double=left, scroll-up=up, scroll-down=down.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

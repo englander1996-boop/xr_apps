@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.lifesec",
+  "edition": "202601",
+  "name": "Lifesec",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Seconds you've been alive.",
+  "description": "Counts seconds since birth. Tap cycles format.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.quote",
+  "edition": "202601",
+  "name": "Quote",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Rotating famous quotes.",
+  "description": "Tap for next, double for random.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

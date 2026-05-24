@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.omikuji",
+  "edition": "202601",
+  "name": "Omikuji",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "おみくじ",
+  "description": "Tap to draw a fortune slip.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.counter",
+  "edition": "202601",
+  "name": "Counter",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Tally counter.",
+  "description": "Tap=+1, double=reset. For inventory, headcount, reps.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

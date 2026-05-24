@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.lastsince",
+  "edition": "202601",
+  "name": "Lastsince",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Time since last X.",
+  "description": "Track when you last did X. Double tap on glasses to mark now.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

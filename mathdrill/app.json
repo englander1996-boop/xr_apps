@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.mathdrill",
+  "edition": "202601",
+  "name": "Math Drill",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Mental arithmetic drill.",
+  "description": "Shows a math problem. Tap to reveal answer, double to skip.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

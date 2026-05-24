@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.eitan",
+  "edition": "202601",
+  "name": "Eitan",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "English vocab flashcards.",
+  "description": "Cycle through ~40 useful English words.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

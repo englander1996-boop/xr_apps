@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.wareki",
+  "edition": "202601",
+  "name": "Wareki",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Year converter (Seireki / Wareki).",
+  "description": "Converts the entered year between Seireki and Japanese eras.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

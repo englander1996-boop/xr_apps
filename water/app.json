@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.water",
+  "edition": "202601",
+  "name": "Water",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Hydration tracker.",
+  "description": "Tap when you drink a cup. Tracks daily count and time since last sip.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

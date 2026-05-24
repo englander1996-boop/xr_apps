@@ -1,0 +1,15 @@
+{
+  "package_id": "com.yuisho.fxrate",
+  "edition": "202601",
+  "name": "FX Rate",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "USD/JPY/EUR/GBP exchange rates.",
+  "description": "ECB official rates via frankfurter.dev. Polls hourly.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": {
+    "network": ["api.frankfurter.dev"],
+    "fs": []
+  }
+}

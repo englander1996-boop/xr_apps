@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.horoscope",
+  "edition": "202601",
+  "name": "Horoscope",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Daily horoscope (offline, deterministic per day).",
+  "description": "Pseudo-random horoscope. Same day = same fortune.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.simon",
+  "edition": "202601",
+  "name": "Simon",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Reproduce the tap sequence.",
+  "description": "Remember the pattern of single/double taps and reproduce it.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

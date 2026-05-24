@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.breathing",
+  "edition": "202601",
+  "name": "Breathing",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Box breathing guide.",
+  "description": "Inhale 4s / hold 4s / exhale 4s / hold 4s loop.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

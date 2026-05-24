@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.dbmeter",
+  "edition": "202601",
+  "name": "dB Meter",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Microphone loudness meter.",
+  "description": "Opens the glasses mic and shows RMS-based dB on the lens.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

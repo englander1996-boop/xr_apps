@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.hiit",
+  "edition": "202601",
+  "name": "HIIT",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Interval training timer.",
+  "description": "20s on / 10s off Tabata-style interval timer.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

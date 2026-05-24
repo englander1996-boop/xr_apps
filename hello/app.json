@@ -1,0 +1,15 @@
+{
+  "package_id": "com.yuisho.hello",
+  "edition": "202601",
+  "name": "Hello",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Hello World for Even G2.",
+  "description": "Minimal Hello World app that renders text on the G2 lens and cycles messages on tap.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": {
+    "network": [],
+    "fs": []
+  }
+}

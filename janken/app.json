@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.janken",
+  "edition": "202601",
+  "name": "Janken",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Rock-paper-scissors against computer.",
+  "description": "Tap cycles your hand. Computer picks. Double commits.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.wordle",
+  "edition": "202601",
+  "name": "Wordle",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "5 letter, 6 guesses.",
+  "description": "Tap=next letter at slot, double=prev letter, scroll moves slot. Past slot 4 = submit.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

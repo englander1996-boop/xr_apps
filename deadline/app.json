@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.deadline",
+  "edition": "202601",
+  "name": "Deadline",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Countdown to a date.",
+  "description": "Shows time remaining until a configurable deadline.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.hilow",
+  "edition": "202601",
+  "name": "Hi-Low",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Hi/Low card game.",
+  "description": "Card draws 1-13. Predict if next is higher or lower.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

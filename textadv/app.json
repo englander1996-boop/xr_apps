@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.textadv",
+  "edition": "202601",
+  "name": "Text Adventure",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Tiny choose-your-own-adventure.",
+  "description": "A few branching paths through a dark cave. Tap = A, double = B.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

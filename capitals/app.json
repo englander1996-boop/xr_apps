@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.capitals",
+  "edition": "202601",
+  "name": "Capitals",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "World capitals flashcards.",
+  "description": "Country → Capital flashcards. Tap to reveal, double for next.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

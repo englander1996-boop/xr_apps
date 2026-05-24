@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.hangman",
+  "edition": "202601",
+  "name": "Hangman",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Classic word-guessing game.",
+  "description": "Scroll to move alphabet cursor, tap to commit, double tap for new game.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

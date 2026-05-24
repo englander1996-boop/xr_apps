@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.coffeelog",
+  "edition": "202601",
+  "name": "Coffee Log",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Cups of coffee today.",
+  "description": "Tap to log a cup. Shows today and 7-day average.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}

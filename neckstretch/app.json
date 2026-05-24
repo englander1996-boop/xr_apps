@@ -1,0 +1,12 @@
+{
+  "package_id": "com.yuisho.neckstretch",
+  "edition": "202601",
+  "name": "Neck Stretch",
+  "version": "0.1.0",
+  "min_app_version": "0.1.0",
+  "tagline": "Guided neck stretches.",
+  "description": "Walks you through 6 neck stretches, 15s each.",
+  "author": "yuisho",
+  "entrypoint": "index.html",
+  "permissions": { "network": [], "fs": [] }
+}
