@@ -4,13 +4,21 @@
 [even-dev](https://github.com/even-dev) ランチャーフレームワークを土台に、自作アプリをワークスペース直下に並べて管理する構成にしてある。
 
 ```
-xr_apps/  ← ワークスペースルート（git 管理外）
-  ├── even-dev/    ← ランチャー本体（clone した OSS）
-  ├── sandbox/     ← 自作アプリ #1
-  ├── <next-app>/  ← 以降の自作アプリはここに並ぶ
-  ├── run.ps1      ← PowerShell ネイティブランチャー
-  └── README.md    ← このファイル
+xr_apps/  ← ワークスペースルート（git 管理）
+  ├── even-dev/      ← ランチャー本体（OSS clone、git 管理外。別途 clone する）
+  ├── _lib/          ← 全自作アプリで共有するヘルパ群（bridge / preview / storage / net）
+  ├── sandbox/       ← 自作アプリ
+  ├── hello/         ← 自作アプリ（Even G2 用 hello world）
+  ├── pomodoro/, hiit/, ...  ← 50+ 個の自作アプリ
+  ├── run.ps1        ← PowerShell ネイティブランチャー
+  ├── README.md      ← このファイル
+  ├── app_lst.md     ← 自作アプリ全 49 個のカテゴリ別カタログ
+  ├── .gitignore     ← node_modules / even-dev / *.ehpk 等を除外
+  └── .gitattributes ← 改行コード正規化（テキストは LF、*.ps1 は CRLF）
 ```
+
+アプリ別の詳細は [`app_lst.md`](./app_lst.md) と各アプリの `README.md` を参照。
+共通ヘルパの API リファレンスは [`_lib/README.md`](./_lib/README.md)。
 
 ---
 
@@ -99,26 +107,29 @@ even-dev 本体は `start-even.sh`（bash, 709 行）で起動するが、Window
 - Windows 10/11
 - [Node.js](https://nodejs.org/) v20+（推奨 v24+）
 - PowerShell 5.1+（Windows 標準）
-- `Y:\xr_apps\` 配下に `even-dev` と `run.ps1` が配置済み（このリポジトリ）
+- `Y:\xr_apps\` 配下にこのリポジトリが clone 済み + `even-dev/` が別途配置済み
+- `_lib/` で `npm install` が一度走っていること
 - PowerShell の `$PROFILE` に `function xr { & Y:\xr_apps\run.ps1 @args }` が登録済み
 
-### sandbox を起動する
+新マシンセットアップは [「新しいマシンへの移行」](#新しいマシンへの移行) 参照。
+
+### hello を起動する
 
 新しい PowerShell ウィンドウで、どのディレクトリにいても：
 
 ```powershell
-xr sandbox
+xr hello
 ```
 
 これだけで：
 
-1. （初回のみ）`even-dev/` と `sandbox/` の `npm install` が走る
+1. （初回のみ）`even-dev/` と `hello/` の `npm install` が走る
 2. Vite 開発サーバが `http://127.0.0.1:5173` で立ち上がる
 3. 起動完了を待って Even Hub Simulator が同 URL を指して起動する
-4. シミュレータ画面に sandbox の UI が表示される
+4. シミュレータ画面に hello の UI が表示され、タップでメッセージが切り替わる
 5. ターミナルで `Ctrl+C` するか Simulator を閉じると、Vite も自動で停止する
 
-引数なし `xr` で対話的にアプリ選択ができる。
+引数なし `xr` で対話的にアプリ選択ができる。他のアプリは [`app_lst.md`](./app_lst.md) を参照。
 
 ---
 
@@ -180,97 +191,135 @@ Windows PowerShell 5.1 では `Process.Kill($true)` が使えないので taskki
 
 ## 新しいアプリを追加する
 
-最短手順（`new-app` という名前で作る例）：
+**推奨は `_lib` ベース** (50 行程度で完結する)。最短手順 (`new-app` という名前で作る例)：
 
 ```powershell
-# 1. base_app をテンプレにコピー
-robocopy Y:\xr_apps\even-dev\apps\base_app Y:\xr_apps\new-app /E /XD node_modules dist /XF package-lock.json
+# 1. ディレクトリ + 必須ファイル を作る (既存アプリをコピーするのが楽)
+robocopy Y:\xr_apps\counter Y:\xr_apps\new-app /E /XD node_modules dist /XF package-lock.json
 ```
 
 ```powershell
-# 2. package.json の "name" を変える
+# 2. package.json の "name" を変える + scripts.dev のポートを衝突しない値に
 #    Y:\xr_apps\new-app\package.json:
 #      "name": "new-app-g2"
+#      "scripts": { "dev": "vite --host 0.0.0.0 --port 5230" }
 ```
 
 ```powershell
 # 3. app.json を新アプリ用に書き換える
 #    Y:\xr_apps\new-app\app.json:
-#      "package_id": "com.<yourname>.newapp",
-#      "name": "New App",
-#      "tagline": "...",
-#      "description": "...",
-#      "author": "<yourname>"
+#      "package_id": "com.<yourname>.newapp"
+#      "name": "New App"
+#      "tagline", "description", "author"
+#      "permissions.network": [...]    ← 外部 API 叩くなら追加
 ```
 
 ```powershell
-# 4. apps.json に登録（先頭がおすすめ：自作アプリが上に来る）
+# 4. src/main.ts のロジック書き換え。_lib ヘルパを使うのが定石：
+#      import { createEvenApp, lines } from '../../_lib/even'
+#      import { setupPreview } from '../../_lib/preview'
+#      const preview = setupPreview({ title: 'New App', buttons: [...] })
+#      const app = await createEvenApp()
+#      app.on('click', () => { ... })
+#      function render() { preview.setContent(...); void app.render(lines(...)) }
+```
+
+```powershell
+# 5. apps.json に登録（先頭付近がおすすめ：自作アプリが上に来る）
 #    Y:\xr_apps\even-dev\apps.json:
-#      {
-#        "sandbox": "../sandbox",
-#        "new-app": "../new-app",   ← 追加
-#        ...
-#      }
+#      { "new-app": "../new-app", ... }
 ```
 
 ```powershell
-# 5. 起動
+# 6. 起動
 xr new-app
 ```
 
 初回起動時に `new-app/` 配下で `npm install` が自動で走る。
+詳しい `_lib` API は [`_lib/README.md`](./_lib/README.md)。
 
 ---
 
 ## アプリの最小構成
 
-`sandbox/` を例にすると、Even G2 アプリに最低限必要なのは以下：
+自作アプリは大きく **「inline 実装」** と **「_lib ベース」** の 2 種類ある。`hello/` は inline、`pomodoro/` 以降は _lib ベース。新規は _lib ベースを推奨。
+
+### _lib ベース (推奨)
 
 ```
-sandbox/
+new-app/
 ├── index.html          # エントリ HTML（<script type="module" src="/src/main.ts">）
-├── package.json        # 依存と scripts.dev / scripts.build
-├── vite.config.ts      # Vite 設定（基本デフォルトでOK）
-├── app.json            # evenhub-cli pack 用のメタデータ
+├── package.json        # 依存（@evenrealities/even_hub_sdk + vite + typescript）と scripts
+├── app.json            # evenhub-cli pack 用のメタデータ（package_id / permissions）
 ├── .gitignore          # node_modules / dist / package-lock.json
 └── src/
-    ├── main.ts         # エントリポイント。グラスへの接続・UI 初期化
-    ├── styles.css      # スタイル
-    └── （任意）         # 機能別モジュール
+    └── main.ts         # ロジック（50-150 行）。_lib をインポートして使う
 ```
+
+`vite.config.ts` は不要 (vite 設定は `even-dev/vite.config.ts` 側で吸収される、`xr <name>` 経由なら)。
+個別に `cd new-app && npm run dev` したい場合だけ自分用に書く。
+
+`src/main.ts` の最小例:
+
+```ts
+import { createEvenApp, lines } from '../../_lib/even'
+import { setupPreview } from '../../_lib/preview'
+
+const preview = setupPreview({
+  title: 'New App',
+  buttons: [{ id: 'go', label: 'Action', onClick: () => action() }],
+})
+const app = await createEvenApp()
+app.setLogger((l) => preview.log(l))
+preview.setStatus(app.connected ? 'Connected' : 'Bridge unavailable (preview only)')
+
+app.on('click', () => action())
+app.on('double', () => reset())
+
+function action() { /* state mutation */ render() }
+function reset() { /* reset state */ render() }
+function render() {
+  preview.setContent('current state...')
+  void app.render(lines('glass line 1', 'glass line 2'))
+}
+render()
+```
+
+`_lib` が「1×1 不可視キャプチャ List の自動設置」「イベント正規化」「デバウンス」「ブラウザ preview 骨格」を肩代わりするので、ボイラが要らない。詳しくは [`_lib/README.md`](./_lib/README.md)。
 
 ### `app.json` の役割
 
 `evenhub-cli pack` がこのファイルを読んで `.ehpk` を作る。スキーマバリデーションがあるので適当な値だと弾かれる。
-重要なのは `package_id`（一意な逆ドメイン形式）と `permissions`（必要なネットワーク先・FS パス）。
+重要なのは `package_id` (一意な逆ドメイン形式) と `permissions` (必要なネットワーク先・FS パス)。
 
-### グラスへの接続コード（最小例）
+### グラスへの接続コード（生 SDK の最小例）
+
+`_lib` を使わない場合（hello が参考実装）:
 
 ```ts
-import { waitForEvenAppBridge } from '@evenrealities/even_hub_sdk'
+import { waitForEvenAppBridge, CreateStartUpPageContainer, ... } from '@evenrealities/even_hub_sdk'
 
 const bridge = await waitForEvenAppBridge()
 
 bridge.onEvenHubEvent((event) => {
   // タップ / ダブルタップ / スワイプ等のハンドリング
-  console.log(event)
 })
 
-// グラス側の UI 構築（CreateStartUpPageContainer など）
-bridge.sendStartUpPage(container)
+await bridge.createStartUpPageContainer(new CreateStartUpPageContainer({
+  containerTotalNum: 2,
+  textObject: [/* 表示用 */],
+  listObject: [/* ← 1×1 不可視 List をここに置かないとタップ取れない */],
+}))
 ```
 
-`base_app/src/main.ts` と `base_app/src/base-template.ts` を読むと、ブラウザ側 UI とグラス側 UI を両方更新する典型パターンが学べる。
+**注意**: テキスト要素単体だとシミュレータからタップが届かない。詳しくは `hello/README.md` 参照。
 
-### `apps/_shared/` のヘルパ群
+### `_lib/` vs `even-dev/apps/_shared/` の違い
 
-自作アプリが `xr_apps/<name>/` にあると `apps/_shared/...` への相対 import パスが届かない（`../../_shared/...` ではない）ので注意。
-共通化したいヘルパは、
+混同しがちなので注意:
 
-- 自分の `xr_apps/_shared/` を作って各アプリから import する、または
-- 各アプリ内に必要分だけコピーする
-
-のどちらか。今のところ sandbox は base_app をベースに `_shared` を相対参照しているので、**そのままだと壊れる**。最初に sandbox を本格的に書き始める段で、_shared を切り離す or コピーする判断をする必要がある。
+- **`xr_apps/_lib/`** = 自作アプリ群が使う共有ヘルパ。**こっちが本命**
+- **`even-dev/apps/_shared/`** = OSS even-dev に同梱されてる built-in アプリ用ヘルパ。自作アプリからは届かない (`../../_shared/...` では `xr_apps/_shared/` を指すが、 hello/sandbox 等 inline 型は何も import しないので問題ない)
 
 ---
 
@@ -429,10 +478,10 @@ npx @evenrealities/evenhub-cli qr out.ehpk
 - 既存ウィンドウで試すなら：`. $PROFILE`
 - ExecutionPolicy が Restricted だと PROFILE すら読まれない：`Get-ExecutionPolicy -List` で確認、必要なら `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
 
-### sandbox 内で `import '../../_shared/...'` が解決されない
+### 自作アプリから `import '../../_shared/...'` が解決されない
 
-- 既知の制約。sandbox は `xr_apps/sandbox/` にあるので、`even-dev/apps/_shared/` には `../../_shared/` では届かない（届くのは `../even-dev/apps/_shared/` だが汚い）
-- 解決策：必要な _shared ファイルを `sandbox/src/_shared/` にコピーする、または `xr_apps/_shared/` を作って各アプリから参照する
+- 既知の制約。自作アプリは `xr_apps/<name>/` にあるので、`even-dev/apps/_shared/` には `../../_shared/` では届かない (届くのは `../even-dev/apps/_shared/` だが汚い)
+- 解決策: **`_lib/` を使う** (`import '../../_lib/even'` 等)。 `xr_apps/_lib/` は親ディレクトリが `fs.allow` に入るので Vite から見える
 
 ### `app.json` 検証エラー
 
@@ -444,30 +493,43 @@ npx @evenrealities/evenhub-cli qr out.ehpk
 
 ## 新しいマシンへの移行
 
-このワークスペース構成を別の Windows マシンに持っていく手順：
+このワークスペース構成を別の Windows マシンに持っていく手順 (git 管理前提)：
 
 ```powershell
-# 1. Node.js を入れる（v20+ 推奨）
+# 1. Node.js を入れる (v20+ 推奨)
 #    https://nodejs.org/ から MSI 取ってきてインストール
 
-# 2. Y:\xr_apps\ を丸ごとコピー（or git で管理しているならクローン）
-#    even-dev/node_modules と各 app/node_modules は持っていかなくて OK（初回起動で入る）
-#    .apps-cache/ も不要
+# 2. このリポジトリを clone (Y:\xr_apps の位置に置くのが標準)
+cd Y:\
+git clone <this-repo-url> xr_apps
+cd Y:\xr_apps
 
-# 3. PowerShell プロファイルに xr 関数を登録
+# 3. even-dev (OSS) を別途 clone (.gitignore 対象なので含まれない)
+git clone https://github.com/even-dev/even-dev.git even-dev
+#    ↑ 用は適切な repo URL に置き換える
+
+# 4. apps.json を復元 (このリポジトリで管理してないので自分でバックアップから戻す)
+#    or 必要なエントリ ("<name>": "../<name>") を手で書く
+
+# 5. _lib の依存をインストール (アプリ側は初回 xr 実行時に自動で入る)
+cd _lib
+npm install
+cd ..
+
+# 6. PowerShell プロファイルに xr 関数を登録
 $profileDir = Split-Path $PROFILE -Parent
 New-Item -ItemType Directory -Force -Path $profileDir | Out-Null
 Add-Content $PROFILE 'function xr { & Y:\xr_apps\run.ps1 @args }'
 
-# 4. ExecutionPolicy 確認（最低 RemoteSigned）
+# 7. ExecutionPolicy 確認 (最低 RemoteSigned)
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 
-# 5. 新しいシェルで動作確認
+# 8. 新しいシェルで動作確認
 xr -List
-xr sandbox
+xr hello
 ```
 
-ドライブレターが `F:` 以外になる場合は `run.ps1` 内の `$Root = 'Y:\xr_apps'` と PROFILE の `Y:\xr_apps\run.ps1` を直すだけで済む。
+ドライブレターが `Y:` 以外になる場合は `run.ps1` 内の `$Root = 'Y:\xr_apps'` と PROFILE の `Y:\xr_apps\run.ps1` を書き換える。
 
 ### 移行時にハマりやすいポイント
 

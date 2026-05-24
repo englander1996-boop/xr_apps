@@ -31,6 +31,9 @@ desktop.ini
 *.swp
 *.swo
 
+# --- Claude Code (workspace) ---------------------------------------
+.claude/
+
 # --- Logs ----------------------------------------------------------
 npm-debug.log*
 *.log
